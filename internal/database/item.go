@@ -1,4 +1,4 @@
-package structures
+package database
 
 type Item struct {
 	Key   []byte

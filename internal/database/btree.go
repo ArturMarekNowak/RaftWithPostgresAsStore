@@ -1,4 +1,4 @@
-package structures
+package database
 
 import (
 	"errors"
