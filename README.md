@@ -1,1 +1,4 @@
 # DistributedDatabaseFromScratch
+
+## Environmental Variables
+- 

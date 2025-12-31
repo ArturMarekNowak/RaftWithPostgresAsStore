@@ -1,12 +1,13 @@
 package main
 
 import (
-	"main/init"
+	"main/setup"
 )
 
 func main() {
-	init.LoadEnvironmentalVariables()
-	logger := init.ConfigureLogger()
-	raft := init.SetupRaft()
-	logger.Info("Node started")
+	logger := setup.ConfigureLogger()
+	setup.LoadEnvironmentalVariables(logger)
+	db := setup.ConfigureDatabaseAndRunMigrations(logger)
+	raft := setup.ConfigureRaft(logger, db)
+	setup.HttpServer(raft, logger, db)
 }
