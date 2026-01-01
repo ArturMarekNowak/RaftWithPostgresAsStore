@@ -1,10 +1,14 @@
 package http
 
 import (
+	"encoding/json"
 	"github.com/hashicorp/go-hclog"
 	"github.com/hashicorp/raft"
+	"io"
 	"main/internal/database"
 	"net/http"
+	"strconv"
+	"time"
 )
 
 type HttpServer struct {
@@ -14,7 +18,7 @@ type HttpServer struct {
 }
 
 func (hs HttpServer) JoinNode(w http.ResponseWriter, r *http.Request) {
-	/*followerId := r.URL.Query().Get("followerId")
+	followerId := r.URL.Query().Get("followerId")
 	followerAddr := r.URL.Query().Get("followerAddr")
 
 	if hs.R.State() != raft.Leader {
@@ -32,54 +36,62 @@ func (hs HttpServer) JoinNode(w http.ResponseWriter, r *http.Request) {
 
 	err := hs.R.AddVoter(raft.ServerID(followerId), raft.ServerAddress(followerAddr), 0, 0).Error()
 	if err != nil {
-		log.Printf("Failed to add follower: %s", err)
+		hs.L.Error("Failed to add follower: %s", err)
 		http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
 	}
 
-	w.WriteHeader(http.StatusOK)*/
+	hs.L.Info("Peer joined raft: %s", followerAddr)
+	w.WriteHeader(http.StatusOK)
 }
 
 func (hs HttpServer) SetValue(w http.ResponseWriter, r *http.Request) {
-	/*defer r.Body.Close()
+	defer r.Body.Close()
 	bs, err := io.ReadAll(r.Body)
 	if err != nil {
-		log.Printf("Could not read key-value in http request: %s", err)
+		hs.L.Error("Could not read key-value in http request: %s", err)
 		http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
 		return
 	}
 
 	future := hs.R.Apply(bs, 500*time.Millisecond)
 	if err := future.Error(); err != nil {
-		log.Printf("Could not write key-value: %s", err)
+		hs.L.Error("Could not write key-value: %s", err)
 		http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
 		return
 	}
 
 	e := future.Response()
 	if e != nil {
-		log.Printf("Could not write key-value, application: %s", e)
+		hs.L.Error("Could not write key-value, application: %s", e)
 		http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
 		return
 	}
 
-	w.WriteHeader(http.StatusOK)*/
+	w.WriteHeader(http.StatusOK)
 }
 
 func (hs HttpServer) GetValue(w http.ResponseWriter, r *http.Request) {
-	/*key := r.URL.Query().Get("key")
-	value, _ := hs.T.Find([]byte(key))
-	if value == nil {
-		value = []byte("")
+	key := r.URL.Query().Get("key")
+	number, err := strconv.ParseUint(key, 10, 64)
+	if err != nil {
+		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		return
+	}
+
+	value, err := hs.T.GetValue(number)
+	if err != nil {
+		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		return
 	}
 
 	rsp := struct {
 		Data string `json:"data"`
-	}{string(value[:])}
-	err := json.NewEncoder(w).Encode(rsp)
+	}{value[:]}
+	err = json.NewEncoder(w).Encode(rsp)
 	if err != nil {
-		log.Printf("Could not encode key-value in http response: %s", err)
+		hs.L.Error("Could not encode key-value in http response: %s", err)
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
-	}*/
+	}
 }
 
 func (hs HttpServer) DeleteValue(w http.ResponseWriter, r *http.Request) {
@@ -89,4 +101,5 @@ func (hs HttpServer) DeleteValue(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
 	}
 	w.WriteHeader(http.StatusNoContent)*/
+	panic("implement me")
 }

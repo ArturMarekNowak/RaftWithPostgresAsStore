@@ -4,6 +4,7 @@ COPY go.mod .
 COPY go.sum .
 RUN go mod download
 COPY . .
-RUN go build -v -o ./app ./cmd/app
+RUN go build -v -o /app
 EXPOSE 8080
-CMD ["./app"]
+EXPOSE 8081
+CMD ["./main"]

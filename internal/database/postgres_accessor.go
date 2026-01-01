@@ -58,6 +58,19 @@ func (p PostgresAccessor) Restore(snapshot io.ReadCloser) error {
 	panic("implement me")
 }
 
+// Not a part of hashicorp/raft
+func (p PostgresAccessor) GetValue(key uint64) (string, error) {
+	log := entities.Fsm{
+		Id: key,
+	}
+	db := p.OpenConnection()
+	queryResult := db.First(&log)
+	if queryResult.RowsAffected == 0 {
+		return "{}", nil
+	}
+	return log.Data, nil
+}
+
 // LogStore methods
 func (p PostgresAccessor) FirstIndex() (uint64, error) {
 	//TODO implement me

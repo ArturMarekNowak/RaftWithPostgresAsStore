@@ -31,6 +31,15 @@ func ConfigureRaft(logger hclog.Logger, db *database.PostgresAccessor) *raft.Raf
 		log.Fatal("Could not create raft instance: %s", err)
 	}
 
+	r.BootstrapCluster(raft.Configuration{
+		Servers: []raft.Server{
+			{
+				ID:      raft.ServerID(nodeId),
+				Address: transport.LocalAddr(),
+			},
+		},
+	})
+
 	raftConfig.Logger = logger
 	return r
 }

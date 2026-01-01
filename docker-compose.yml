@@ -1,0 +1,32 @@
+version: '3.8'
+
+services:
+  app-0:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: app
+    environment:
+      - RAFT_NODE_ID=0
+      - CONNECTION_STRING=postgresql://postgres:admin@192.168.1.126:5432/Raft1?sslmode=disable
+    ports:
+      - "5001:8080"
+      - "5081:8081"
+
+  app-1:
+    image: app
+    environment:
+      - RAFT_NODE_ID=1
+      - CONNECTION_STRING=postgresql://postgres:admin@192.168.1.126:5432/Raft2?sslmode=disable
+    ports:
+      - "5002:8080"
+      - "5082:8081"
+
+  app-2:
+    image: app
+    environment:
+      - RAFT_NODE_ID=2
+      - CONNECTION_STRING=postgresql://postgres:admin@192.168.1.126:5432/Raft3?sslmode=disable
+    ports:
+      - "5003:8080"
+      - "5083:8081"
