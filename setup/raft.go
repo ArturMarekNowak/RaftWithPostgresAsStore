@@ -37,9 +37,7 @@ func ConfigureRaft(logger hclog.Logger, db *database.PostgresAccessor) *raft.Raf
 				ID:      raft.ServerID(nodeId),
 				Address: transport.LocalAddr(),
 			},
-		},
-	})
+		}})
 
-	raftConfig.Logger = logger
 	return r
 }

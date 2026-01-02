@@ -1,6 +1,7 @@
 package database
 
 import (
+	"errors"
 	"github.com/hashicorp/go-hclog"
 	"github.com/hashicorp/raft"
 	"gorm.io/driver/postgres"
@@ -88,9 +89,13 @@ func (p PostgresAccessor) LastIndex() (uint64, error) {
 	return log.Index, nil
 }
 
-func (p PostgresAccessor) GetLog(index uint64, log *raft.Log) error {
-	//TODO implement me
-	panic("implement me")
+func (p PostgresAccessor) GetLog(index uint64, raftLog *raft.Log) error {
+	log := entities.Log{}
+	db := p.OpenConnection()
+	queryResult := db.First(&log, index)
+	// TODO Not the most elegant, is it?
+	log.FillRaftLog(raftLog)
+	return queryResult.Error
 }
 
 func (p PostgresAccessor) StoreLog(raftLog *raft.Log) error {
@@ -114,6 +119,7 @@ func (p PostgresAccessor) DeleteRange(min, max uint64) error {
 
 // StableStore methods
 func (p PostgresAccessor) Set(key []byte, val []byte) error {
+	//Tu skończyłeś
 	//TODO implement me
 	panic("implement me")
 }
@@ -140,7 +146,8 @@ func (p PostgresAccessor) GetUint64(key []byte) (uint64, error) {
 	db := p.OpenConnection()
 	queryResult := db.First(&stableLog)
 	if queryResult.RowsAffected == 0 {
-		return 0, nil
+		// Error name required by raft@v1.7.3/api.go:510
+		return 0, errors.New("not found")
 	}
 	return stableLog.Value, nil
 }
