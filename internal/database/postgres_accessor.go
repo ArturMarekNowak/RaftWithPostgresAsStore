@@ -80,11 +80,12 @@ func (p PostgresAccessor) FirstIndex() (uint64, error) {
 func (p PostgresAccessor) LastIndex() (uint64, error) {
 	log := entities.Log{}
 	db := p.OpenConnection()
+	// TODO Select only Id
 	queryResult := db.Last(&log)
 	if queryResult.RowsAffected == 0 {
 		return 0, nil
 	}
-	return log.Id, nil
+	return log.Index, nil
 }
 
 func (p PostgresAccessor) GetLog(index uint64, log *raft.Log) error {
@@ -92,10 +93,11 @@ func (p PostgresAccessor) GetLog(index uint64, log *raft.Log) error {
 	panic("implement me")
 }
 
-func (p PostgresAccessor) StoreLog(log *raft.Log) error {
-	//TODO implement me
-	// Tu skończyłeś
-	panic("implement me")
+func (p PostgresAccessor) StoreLog(raftLog *raft.Log) error {
+	log := entities.NewLog(raftLog)
+	db := p.OpenConnection()
+	queryResult := db.Create(log)
+	return queryResult.Error
 }
 
 func (p PostgresAccessor) StoreLogs(logs []*raft.Log) error {
