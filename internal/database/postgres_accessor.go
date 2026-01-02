@@ -96,7 +96,9 @@ func (p PostgresAccessor) GetLog(index uint64, log *raft.Log) error {
 func (p PostgresAccessor) StoreLog(raftLog *raft.Log) error {
 	log := entities.NewLog(raftLog)
 	db := p.OpenConnection()
-	queryResult := db.Create(log)
+	// Don't miss the &
+	// Source: https://stackoverflow.com/questions/59947933/err-reflect-flag-mustbeassignable-using-unaddressable-value-as-i-try-to-use-bin
+	queryResult := db.Create(&log)
 	return queryResult.Error
 }
 
