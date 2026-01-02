@@ -94,6 +94,7 @@ func (p PostgresAccessor) GetLog(index uint64, log *raft.Log) error {
 
 func (p PostgresAccessor) StoreLog(log *raft.Log) error {
 	//TODO implement me
+	// Tu skończyłeś
 	panic("implement me")
 }
 
@@ -129,9 +130,11 @@ func (p PostgresAccessor) SetUint64(key []byte, val uint64) error {
 }
 
 func (p PostgresAccessor) GetUint64(key []byte) (uint64, error) {
-	stableLog := entities.StableLog{}
+	stableLog := entities.StableLog{
+		Id: key,
+	}
 	db := p.OpenConnection()
-	queryResult := db.First(&stableLog, key)
+	queryResult := db.First(&stableLog)
 	if queryResult.RowsAffected == 0 {
 		return 0, nil
 	}
