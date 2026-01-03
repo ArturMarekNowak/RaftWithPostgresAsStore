@@ -5,9 +5,10 @@ import (
 	"main/internal/database"
 )
 
-func ConfigureDatabaseAndRunMigrations(logger hclog.Logger) *database.PostgresAccessor {
+func ConfigureDatabaseAndRunMigrations(dbName string, logger hclog.Logger) *database.PostgresAccessor {
 	db := &database.PostgresAccessor{
-		Logger: logger,
+		Logger:       logger,
+		DatabaseName: dbName,
 	}
 	db.RunMigrations()
 	return db

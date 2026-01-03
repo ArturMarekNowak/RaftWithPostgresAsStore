@@ -10,33 +10,29 @@ import (
 	"time"
 )
 
-func ConfigureRaft(logger hclog.Logger, db *database.PostgresAccessor) *raft.Raft {
-	advertiseAddressEnv := os.Getenv("RAFT_ADVERTISE_ADDRESS")
-	advertiseAddress, err := net.ResolveTCPAddr("tcp", advertiseAddressEnv)
+func ConfigureRaft(raftPort, raftId string, logger hclog.Logger, db *database.PostgresAccessor) *raft.Raft {
+	tcpAddr, err := net.ResolveTCPAddr("tcp", "127.0.0.1:"+raftPort)
 	if err != nil {
-		log.Fatal("Could not resolve address: %s", err)
+		logger.Error("Could not resolve address: %s", err)
 	}
 
-	bindAddressEnv := os.Getenv("RAFT_BIND_ADDRESS")
-
-	transport, err := raft.NewTCPTransport(bindAddressEnv, advertiseAddress, 10, time.Second*10, os.Stderr)
+	transport, err := raft.NewTCPTransport("127.0.0.1:"+raftPort, tcpAddr, 10, time.Second*10, os.Stderr)
 	if err != nil {
 		log.Fatal("Could not create tcp transport: %s", err)
 	}
 
-	nodeId := os.Getenv("RAFT_NODE_ID")
 	raftConfig := raft.DefaultConfig()
-	raftConfig.LocalID = raft.ServerID(nodeId)
+	raftConfig.LocalID = raft.ServerID(raftId)
 
 	r, err := raft.NewRaft(raftConfig, db, db, db, db, transport)
 	if err != nil {
-		log.Fatal("Could not create raft instance: %s", err)
+		logger.Error("Could not create raft instance: %s", err)
 	}
 
 	r.BootstrapCluster(raft.Configuration{
 		Servers: []raft.Server{
 			{
-				ID:      raft.ServerID(nodeId),
+				ID:      raft.ServerID(raftId),
 				Address: transport.LocalAddr(),
 			},
 		}})

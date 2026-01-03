@@ -6,8 +6,8 @@ import (
 
 func main() {
 	logger := setup.ConfigureLogger()
-	setup.LoadEnvironmentalVariables(logger)
-	db := setup.ConfigureDatabaseAndRunMigrations(logger)
-	raft := setup.ConfigureRaft(logger, db)
-	setup.HttpServer(raft, logger, db)
+	httpPort, raftPort, raftId, dbName := setup.LoadArguments()
+	db := setup.ConfigureDatabaseAndRunMigrations(dbName, logger)
+	raft := setup.ConfigureRaft(raftPort, raftId, logger, db)
+	setup.HttpServer(httpPort, raft, logger, db)
 }

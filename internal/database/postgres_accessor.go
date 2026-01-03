@@ -3,17 +3,18 @@ package database
 import (
 	"encoding/binary"
 	"errors"
+	"fmt"
 	"github.com/hashicorp/go-hclog"
 	"github.com/hashicorp/raft"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 	"io"
 	"main/internal/database/entities"
-	"os"
 )
 
 type PostgresAccessor struct {
-	Logger hclog.Logger
+	Logger       hclog.Logger
+	DatabaseName string
 }
 
 // SnapshotStore methods
@@ -184,7 +185,8 @@ func (p PostgresAccessor) RunMigrations() {
 }
 
 func (p PostgresAccessor) OpenConnection() *gorm.DB {
-	connectionString := os.Getenv("CONNECTION_STRING")
+	connectionStringTemplate := `postgresql://postgres:admin@127.0.0.1:5432/%s?sslmode=disable`
+	connectionString := fmt.Sprintf(connectionStringTemplate, p.DatabaseName)
 	db, err := gorm.Open(postgres.Open(connectionString))
 	if err != nil {
 		p.Logger.Error("Failed to connect database")

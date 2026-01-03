@@ -6,10 +6,9 @@ import (
 	"main/internal/database"
 	httptutil "main/internal/http"
 	"net/http"
-	"os"
 )
 
-func HttpServer(r *raft.Raft, logger hclog.Logger, db *database.PostgresAccessor) {
+func HttpServer(httpPort string, r *raft.Raft, logger hclog.Logger, db *database.PostgresAccessor) {
 	httpServer := &httptutil.HttpServer{r, logger, db}
 
 	router := http.NewServeMux()
@@ -17,7 +16,7 @@ func HttpServer(r *raft.Raft, logger hclog.Logger, db *database.PostgresAccessor
 	router.HandleFunc("POST /value", httpServer.SetValue)
 	router.HandleFunc("GET /value", httpServer.GetValue)
 	router.HandleFunc("DELETE /value", httpServer.DeleteValue)
-	err := http.ListenAndServe(os.Getenv("HTTP_ADDRESS"), router)
+	err := http.ListenAndServe("127.0.0.1:"+httpPort, router)
 	if err != nil {
 		panic("Couldn't start HTTP server")
 	}
