@@ -1,6 +1,7 @@
 package database
 
 import (
+	"encoding/binary"
 	"errors"
 	"github.com/hashicorp/go-hclog"
 	"github.com/hashicorp/raft"
@@ -74,8 +75,14 @@ func (p PostgresAccessor) GetValue(key uint64) (string, error) {
 
 // LogStore methods
 func (p PostgresAccessor) FirstIndex() (uint64, error) {
-	//TODO implement me
-	panic("implement me")
+	log := entities.Log{}
+	db := p.OpenConnection()
+	// TODO Select only Id
+	queryResult := db.First(&log)
+	if queryResult.RowsAffected == 0 {
+		return 0, nil
+	}
+	return log.Index, nil
 }
 
 func (p PostgresAccessor) LastIndex() (uint64, error) {
@@ -108,8 +115,13 @@ func (p PostgresAccessor) StoreLog(raftLog *raft.Log) error {
 }
 
 func (p PostgresAccessor) StoreLogs(logs []*raft.Log) error {
-	//TODO implement me
-	panic("implement me")
+	for i := 0; i < len(logs); i++ {
+		err := p.StoreLog(logs[i])
+		if err != nil {
+			return err
+		}
+	}
+	return nil
 }
 
 func (p PostgresAccessor) DeleteRange(min, max uint64) error {
@@ -119,9 +131,8 @@ func (p PostgresAccessor) DeleteRange(min, max uint64) error {
 
 // StableStore methods
 func (p PostgresAccessor) Set(key []byte, val []byte) error {
-	//Tu skończyłeś
-	//TODO implement me
-	panic("implement me")
+	num := binary.LittleEndian.Uint64(val)
+	return p.SetUint64(key, num)
 }
 
 func (p PostgresAccessor) Get(key []byte) ([]byte, error) {
