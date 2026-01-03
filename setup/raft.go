@@ -11,13 +11,15 @@ import (
 )
 
 func ConfigureRaft(logger hclog.Logger, db *database.PostgresAccessor) *raft.Raft {
-	raftAddress := os.Getenv("RAFT_ADDRESS")
-	tcpAddr, err := net.ResolveTCPAddr("tcp", raftAddress)
+	advertiseAddressEnv := os.Getenv("RAFT_ADVERTISE_ADDRESS")
+	advertiseAddress, err := net.ResolveTCPAddr("tcp", advertiseAddressEnv)
 	if err != nil {
 		log.Fatal("Could not resolve address: %s", err)
 	}
 
-	transport, err := raft.NewTCPTransport(raftAddress, tcpAddr, 10, time.Second*10, os.Stderr)
+	bindAddressEnv := os.Getenv("RAFT_BIND_ADDRESS")
+
+	transport, err := raft.NewTCPTransport(bindAddressEnv, advertiseAddress, 10, time.Second*10, os.Stderr)
 	if err != nil {
 		log.Fatal("Could not create tcp transport: %s", err)
 	}
