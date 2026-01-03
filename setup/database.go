@@ -6,9 +6,9 @@ import (
 )
 
 func ConfigureDatabaseAndRunMigrations(dbName string, logger hclog.Logger) *database.PostgresAccessor {
-	db := &database.PostgresAccessor{
-		Logger:       logger,
-		DatabaseName: dbName,
+	db, err := database.NewPostgresAccessor(dbName, logger)
+	if err != nil {
+		panic("Couldnt initialize db")
 	}
 	db.RunMigrations()
 	return db
