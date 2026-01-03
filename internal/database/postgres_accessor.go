@@ -115,6 +115,7 @@ func (p PostgresAccessor) StoreLog(raftLog *raft.Log) error {
 }
 
 func (p PostgresAccessor) StoreLogs(logs []*raft.Log) error {
+	// TODO Not the best idea to open connections so many times but we will stick with this for the time being
 	for i := 0; i < len(logs); i++ {
 		err := p.StoreLog(logs[i])
 		if err != nil {
@@ -136,8 +137,14 @@ func (p PostgresAccessor) Set(key []byte, val []byte) error {
 }
 
 func (p PostgresAccessor) Get(key []byte) ([]byte, error) {
-	//TODO implement me
-	panic("implement me")
+	valInt64, err := p.GetUint64(key)
+	if err != nil {
+		// stable.go:11
+		return []byte{}, errors.New("not found")
+	}
+	val := []byte{}
+	binary.LittleEndian.PutUint64(val, valInt64)
+	return val, nil
 }
 
 // Source: https://stackoverflow.com/questions/39333102/how-to-create-or-update-a-record-with-gorm
