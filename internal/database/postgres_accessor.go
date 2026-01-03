@@ -2,6 +2,7 @@ package database
 
 import (
 	"encoding/binary"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"github.com/hashicorp/go-hclog"
@@ -71,10 +72,33 @@ func (p PostgresAccessor) Open(id string) (*raft.SnapshotMeta, io.ReadCloser, er
 	panic("implement me")
 }
 
+type setPayload struct {
+	Key   string
+	Value string
+}
+
 // FSM methods
 func (p PostgresAccessor) Apply(log *raft.Log) interface{} {
-	//TODO implement me
-	panic("implement me")
+	switch log.Type {
+	case raft.LogCommand:
+		var sp setPayload
+		err := json.Unmarshal(log.Data, &sp)
+		if err != nil {
+			return fmt.Errorf("Could not parse payload: %s", err)
+		}
+
+		fsm := entities.Fsm{
+			Id:   sp.Key,
+			Data: sp.Value,
+		}
+		if p.db.Model(&fsm).Where("id = ?", fsm.Id).Updates(&fsm).RowsAffected == 0 {
+			p.db.Create(&fsm)
+		}
+	default:
+		return fmt.Errorf("Unknown raft log type: %#v", log.Type)
+	}
+
+	return nil
 }
 
 func (p PostgresAccessor) Snapshot() (raft.FSMSnapshot, error) {
@@ -88,7 +112,7 @@ func (p PostgresAccessor) Restore(snapshot io.ReadCloser) error {
 }
 
 // Not a part of hashicorp/raft
-func (p PostgresAccessor) GetValue(key uint64) (string, error) {
+func (p PostgresAccessor) GetValue(key string) (string, error) {
 	log := entities.Fsm{
 		Id: key,
 	}

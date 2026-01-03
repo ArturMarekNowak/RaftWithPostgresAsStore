@@ -7,7 +7,6 @@ import (
 	"io"
 	"main/internal/database"
 	"net/http"
-	"strconv"
 	"time"
 )
 
@@ -72,13 +71,7 @@ func (hs HttpServer) SetValue(w http.ResponseWriter, r *http.Request) {
 
 func (hs HttpServer) GetValue(w http.ResponseWriter, r *http.Request) {
 	key := r.URL.Query().Get("key")
-	number, err := strconv.ParseUint(key, 10, 64)
-	if err != nil {
-		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
-		return
-	}
-
-	value, err := hs.T.GetValue(number)
+	value, err := hs.T.GetValue(key)
 	if err != nil {
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 		return
