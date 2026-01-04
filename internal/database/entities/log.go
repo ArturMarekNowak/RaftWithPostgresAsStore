@@ -21,7 +21,6 @@ func (l Log) FillRaftLog(raftLog *raft.Log) {
 	raftLog.Data = l.Data
 	raftLog.Extensions = l.Extensions
 	raftLog.AppendedAt = l.AppendedAt
-
 }
 
 // Source: https://tutorialedge.net/golang/go-constructors-tutorial/

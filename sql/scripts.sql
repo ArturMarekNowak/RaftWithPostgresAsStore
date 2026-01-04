@@ -1,4 +1,4 @@
--- yeah, I dont like SQL
+-- I dont like SQL
 DROP DATABASE "Raft1";
 DROP DATABASE "Raft2";
 DROP DATABASE "Raft3";

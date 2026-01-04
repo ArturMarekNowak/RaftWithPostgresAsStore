@@ -2,14 +2,14 @@ package setup
 
 import (
 	"github.com/hashicorp/go-hclog"
-	"main/internal/database"
+	databaseutil "main/internal/database"
 )
 
-func ConfigureDatabaseAndRunMigrations(dbName string, logger hclog.Logger) *database.PostgresAccessor {
-	db, err := database.NewPostgresAccessor(dbName, logger)
+func ConfigureDatabaseAndRunMigrations(databaseName string, logger hclog.Logger) *databaseutil.PostgresAccessor {
+	database, err := databaseutil.NewPostgresAccessor(databaseName, logger)
 	if err != nil {
-		panic("Couldnt initialize db")
+		panic("Could not initialize the postgres database")
 	}
-	db.RunMigrations()
-	return db
+	database.RunMigrations()
+	return database
 }

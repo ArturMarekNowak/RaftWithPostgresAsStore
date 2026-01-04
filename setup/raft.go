@@ -10,13 +10,13 @@ import (
 	"time"
 )
 
-func ConfigureRaft(raftPort, raftId string, logger hclog.Logger, db *database.PostgresAccessor) *raft.Raft {
-	tcpAddr, err := net.ResolveTCPAddr("tcp", "127.0.0.1:"+raftPort)
+func ConfigureRaft(raftPort, raftId string, logger hclog.Logger, database *database.PostgresAccessor) *raft.Raft {
+	tcpAddress, err := net.ResolveTCPAddr("tcp", "127.0.0.1:"+raftPort)
 	if err != nil {
 		logger.Error("Could not resolve address: %s", err)
 	}
 
-	transport, err := raft.NewTCPTransport("127.0.0.1:"+raftPort, tcpAddr, 10, time.Second*10, os.Stderr)
+	transport, err := raft.NewTCPTransport("127.0.0.1:"+raftPort, tcpAddress, 10, time.Second*10, os.Stderr)
 	if err != nil {
 		log.Fatal("Could not create tcp transport: %s", err)
 	}
@@ -24,7 +24,7 @@ func ConfigureRaft(raftPort, raftId string, logger hclog.Logger, db *database.Po
 	raftConfig := raft.DefaultConfig()
 	raftConfig.LocalID = raft.ServerID(raftId)
 
-	r, err := raft.NewRaft(raftConfig, db, db, db, db, transport)
+	r, err := raft.NewRaft(raftConfig, database, database, database, database, transport)
 	if err != nil {
 		logger.Error("Could not create raft instance: %s", err)
 	}

@@ -23,9 +23,9 @@ Run three instances
 
 Add followers to the leader
 
-`curl http://localhost:8081/join?followerAddr=localhost:8882&followerId=2`
+`curl http://localhost:8081/join?followerAddress=localhost:8882&followerId=2`
 
-`curl http://localhost:8081/join?followerAddr=localhost:8883&followerId=3`
+`curl http://localhost:8081/join?followerAddress=localhost:8883&followerId=3`
 
 Send key value to the leader
 

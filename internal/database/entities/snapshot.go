@@ -15,7 +15,6 @@ type Snapshot struct {
 }
 
 func (s Snapshot) MapToRaftSnapshotMeta() (*raft.SnapshotMeta, error) {
-
 	var raftConfig raft.Configuration
 	config := []byte(s.Configuration)
 	if err := json.Unmarshal(config, &raftConfig); err != nil {

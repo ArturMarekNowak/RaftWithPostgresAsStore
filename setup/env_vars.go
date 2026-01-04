@@ -3,7 +3,7 @@ package setup
 import "os"
 
 func LoadArguments() (string, string, string, string) {
-	var httpPort, raftPort, raftId, dbName string
+	var httpPort, raftPort, raftId, databaseName string
 	for i, arg := range os.Args[1:] {
 		if arg == "--raft-id" {
 			raftId = os.Args[i+2]
@@ -21,14 +21,14 @@ func LoadArguments() (string, string, string, string) {
 		}
 
 		if arg == "--db-name" {
-			dbName = os.Args[i+2]
+			databaseName = os.Args[i+2]
 			continue
 		}
 	}
 
-	if httpPort == "" || raftPort == "" || raftId == "" || dbName == "" {
+	if httpPort == "" || raftPort == "" || raftId == "" || databaseName == "" {
 		panic("must provide --raft-id, --http-port, --raft-port, --db-name as arguments")
 	}
 
-	return httpPort, raftPort, raftId, dbName
+	return httpPort, raftPort, raftId, databaseName
 }

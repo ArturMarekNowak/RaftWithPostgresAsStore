@@ -8,8 +8,8 @@ import (
 	"net/http"
 )
 
-func HttpServer(httpPort string, r *raft.Raft, logger hclog.Logger, db *database.PostgresAccessor) {
-	httpServer := &httptutil.HttpServer{r, logger, db}
+func HttpServer(httpPort string, raft *raft.Raft, logger hclog.Logger, database *database.PostgresAccessor) {
+	httpServer := httptutil.NewHttpServer(raft, logger, database)
 
 	router := http.NewServeMux()
 	router.HandleFunc("POST /join", httpServer.JoinNode)
