@@ -4,7 +4,7 @@ This repo is highly inspired by [eatonphil](https://github.com/eatonphil) [raft-
 
 One day I was deep diving into replication algorithms. I stumbled upon many examples utilizing [hashicorp raft library](https://github.com/hashicorp/raft) for this purpose. But all of those examples utilized in-memory and/or disk based data structures for storage. I thought: "what if instead of using in-memory just use simple, beloved postgres?". So I did it.
 
-<p align="center"><img src="./docs/drake.png"/>
+<p align="center"><img width="455" height="291" src="./docs/drake.png"/>
 <p align="center">Pic.1 Meme</p>
 
 I am not certain if each of the domains of the raft (snapshots, fsms, logs, stable logs) should be persisted on database. Maybe there are better ways and my current understanding of raft is simply poor but I just went with it. Speaking of caveats... 
